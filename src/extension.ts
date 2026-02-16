@@ -4,6 +4,7 @@ import * as fs from "fs";
 import { NotebookParser } from "./notebookParser";
 import { DocxGenerator } from "./docxGenerator";
 import { PdfGenerator } from "./pdfGenerator";
+import { SettingsWebview } from "./settingsWebview";
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log("Jupyter Export is now active!");
@@ -114,19 +115,202 @@ export function activate(context: vscode.ExtensionContext) {
 								"outputDir",
 							) ||
 							"docs/jupyter-notebook";
-						const fontFamily =
-							config.get<string>(
-								"fontFamily",
-							) || "Helvetica";
-						const fontSize =
-							config.get<number>(
-								"fontSize",
-							) || 12;
+
+						const getCfg = (
+							section: string,
+							key: string,
+							defaultVal: any,
+						) =>
+							config.get(
+								`${section}.${key}`,
+							) || defaultVal;
 
 						const generatorConfig = {
 							outputDir: outputDirConfig,
-							fontFamily,
-							fontSize,
+							word: {
+								heading1: {
+									fontFamily:
+										(config.get(
+											"word.heading1.fontFamily",
+										) as string) ||
+										"Helvetica",
+									fontSize:
+										(config.get(
+											"word.heading1.fontSize",
+										) as number) ||
+										24,
+									color:
+										(config.get(
+											"word.heading1.color",
+										) as string) ||
+										"000000",
+								},
+								heading2: {
+									fontFamily:
+										(config.get(
+											"word.heading2.fontFamily",
+										) as string) ||
+										"Helvetica",
+									fontSize:
+										(config.get(
+											"word.heading2.fontSize",
+										) as number) ||
+										18,
+									color:
+										(config.get(
+											"word.heading2.color",
+										) as string) ||
+										"000000",
+								},
+								heading3: {
+									fontFamily:
+										(config.get(
+											"word.heading3.fontFamily",
+										) as string) ||
+										"Helvetica",
+									fontSize:
+										(config.get(
+											"word.heading3.fontSize",
+										) as number) ||
+										14,
+									color:
+										(config.get(
+											"word.heading3.color",
+										) as string) ||
+										"000000",
+								},
+								body: {
+									fontFamily:
+										(config.get(
+											"word.body.fontFamily",
+										) as string) ||
+										"Helvetica",
+									fontSize:
+										(config.get(
+											"word.body.fontSize",
+										) as number) ||
+										12,
+									color:
+										(config.get(
+											"word.body.color",
+										) as string) ||
+										"000000",
+								},
+								code: {
+									fontFamily:
+										(config.get(
+											"word.code.fontFamily",
+										) as string) ||
+										"Courier New",
+									fontSize:
+										(config.get(
+											"word.code.fontSize",
+										) as number) ||
+										10,
+									backgroundColor:
+										(config.get(
+											"word.code.backgroundColor",
+										) as string) ||
+										"F0F0F0",
+									color:
+										(config.get(
+											"word.code.color",
+										) as string) ||
+										"000000",
+								},
+							},
+							pdf: {
+								heading1: {
+									fontFamily:
+										(config.get(
+											"pdf.heading1.fontFamily",
+										) as string) ||
+										"Helvetica",
+									fontSize:
+										(config.get(
+											"pdf.heading1.fontSize",
+										) as number) ||
+										24,
+									color:
+										(config.get(
+											"pdf.heading1.color",
+										) as string) ||
+										"000000",
+								},
+								heading2: {
+									fontFamily:
+										(config.get(
+											"pdf.heading2.fontFamily",
+										) as string) ||
+										"Helvetica",
+									fontSize:
+										(config.get(
+											"pdf.heading2.fontSize",
+										) as number) ||
+										18,
+									color:
+										(config.get(
+											"pdf.heading2.color",
+										) as string) ||
+										"000000",
+								},
+								heading3: {
+									fontFamily:
+										(config.get(
+											"pdf.heading3.fontFamily",
+										) as string) ||
+										"Helvetica",
+									fontSize:
+										(config.get(
+											"pdf.heading3.fontSize",
+										) as number) ||
+										14,
+									color:
+										(config.get(
+											"pdf.heading3.color",
+										) as string) ||
+										"000000",
+								},
+								body: {
+									fontFamily:
+										(config.get(
+											"pdf.body.fontFamily",
+										) as string) ||
+										"Helvetica",
+									fontSize:
+										(config.get(
+											"pdf.body.fontSize",
+										) as number) ||
+										12,
+									color:
+										(config.get(
+											"pdf.body.color",
+										) as string) ||
+										"000000",
+								},
+								code: {
+									fontFamily:
+										(config.get(
+											"pdf.code.fontFamily",
+										) as string) ||
+										"Courier",
+									fontSize:
+										(config.get(
+											"pdf.code.fontSize",
+										) as number) ||
+										10,
+									backgroundColor:
+										(config.get(
+											"pdf.code.backgroundColor",
+										) as string) ||
+										"F0F0F0",
+									color:
+										(config.get(
+											"pdf.code.color",
+										) as string) ||
+										"000000",
+								},
+							},
 						};
 
 						let buffer: Uint8Array;
@@ -234,6 +418,15 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(exportCommand);
+
+	const exportStylingCommand = vscode.commands.registerCommand(
+		"jupyterExport.exportStyling",
+		() => {
+			SettingsWebview.createOrShow(context.extensionUri);
+		},
+	);
+
+	context.subscriptions.push(exportStylingCommand);
 }
 
 export function deactivate() {}

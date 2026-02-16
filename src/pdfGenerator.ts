@@ -19,8 +19,30 @@ interface ASTNode {
 
 export interface GeneratorConfig {
 	outputDir: string;
-	fontFamily: string;
-	fontSize: number;
+	pdf: {
+		heading1: {
+			fontFamily: string;
+			fontSize: number;
+			color: string;
+		};
+		heading2: {
+			fontFamily: string;
+			fontSize: number;
+			color: string;
+		};
+		heading3: {
+			fontFamily: string;
+			fontSize: number;
+			color: string;
+		};
+		body: { fontFamily: string; fontSize: number; color: string };
+		code: {
+			fontFamily: string;
+			fontSize: number;
+			backgroundColor: string;
+			color: string;
+		};
+	};
 }
 
 export class PdfGenerator {
@@ -44,69 +66,122 @@ export class PdfGenerator {
 	constructor(
 		config: GeneratorConfig = {
 			outputDir: "docs/jupyter-notebook",
-			fontFamily: "Helvetica",
-			fontSize: 12,
+			pdf: {
+				heading1: {
+					fontFamily: "Helvetica",
+					fontSize: 24,
+					color: "000000",
+				},
+				heading2: {
+					fontFamily: "Helvetica",
+					fontSize: 18,
+					color: "000000",
+				},
+				heading3: {
+					fontFamily: "Helvetica",
+					fontSize: 14,
+					color: "000000",
+				},
+				body: {
+					fontFamily: "Helvetica",
+					fontSize: 12,
+					color: "000000",
+				},
+				code: {
+					fontFamily: "Courier",
+					fontSize: 10,
+					backgroundColor: "F0F0F0",
+					color: "000000",
+				},
+			},
 		},
 	) {
 		this.config = config;
-		this.fontSize = config.fontSize;
-		this.lineHeight = Math.round(config.fontSize * 1.2);
+		this.fontSize = config.pdf.body.fontSize;
+		this.lineHeight = Math.round(this.fontSize * 1.2);
 	}
 
 	public async generate(data: NotebookData): Promise<Uint8Array> {
 		this.pdfDoc = await PDFDocument.create();
 
-		switch (this.config.fontFamily) {
-			case "Times-Roman":
-				this.font = await this.pdfDoc.embedFont(
-					StandardFonts.TimesRoman,
-				);
-				this.boldFont = await this.pdfDoc.embedFont(
-					StandardFonts.TimesRomanBold,
-				);
-				this.italicFont = await this.pdfDoc.embedFont(
-					StandardFonts.TimesRomanItalic,
-				);
-				this.boldItalicFont =
-					await this.pdfDoc.embedFont(
-						StandardFonts.TimesRomanBoldItalic,
-					);
-				break;
-			case "Courier":
-				this.font = await this.pdfDoc.embedFont(
-					StandardFonts.Courier,
-				);
-				this.boldFont = await this.pdfDoc.embedFont(
-					StandardFonts.CourierBold,
-				);
-				this.italicFont = await this.pdfDoc.embedFont(
-					StandardFonts.CourierOblique,
-				);
-				this.boldItalicFont =
-					await this.pdfDoc.embedFont(
-						StandardFonts.CourierBoldOblique,
-					);
-				break;
-			case "Helvetica":
-			default:
-				this.font = await this.pdfDoc.embedFont(
-					StandardFonts.Helvetica,
-				);
-				this.boldFont = await this.pdfDoc.embedFont(
-					StandardFonts.HelveticaBold,
-				);
-				this.italicFont = await this.pdfDoc.embedFont(
-					StandardFonts.HelveticaOblique,
-				);
-				this.boldItalicFont =
-					await this.pdfDoc.embedFont(
-						StandardFonts.HelveticaBoldOblique,
-					);
-				break;
-		}
+		// Load standard fonts
+		// Helper to load font based on name
+		const loadFont = async (
+			name: string,
+			type:
+				| "Regular"
+				| "Bold"
+				| "Italic"
+				| "BoldItalic" = "Regular",
+		) => {
+			let standardFont = StandardFonts.Helvetica;
+			if (name === "Times-Roman") {
+				if (type === "Regular") {
+					standardFont = StandardFonts.TimesRoman;
+				}
+				if (type === "Bold") {
+					standardFont =
+						StandardFonts.TimesRomanBold;
+				}
+				if (type === "Italic") {
+					standardFont =
+						StandardFonts.TimesRomanItalic;
+				}
+				if (type === "BoldItalic") {
+					standardFont =
+						StandardFonts.TimesRomanBoldItalic;
+				}
+			} else if (name === "Courier") {
+				if (type === "Regular") {
+					standardFont = StandardFonts.Courier;
+				}
+				if (type === "Bold") {
+					standardFont =
+						StandardFonts.CourierBold;
+				}
+				if (type === "Italic") {
+					standardFont =
+						StandardFonts.CourierOblique;
+				}
+				if (type === "BoldItalic") {
+					standardFont =
+						StandardFonts.CourierBoldOblique;
+				}
+			} else {
+				// Helvetica default
+				if (type === "Regular") {
+					standardFont = StandardFonts.Helvetica;
+				}
+				if (type === "Bold") {
+					standardFont =
+						StandardFonts.HelveticaBold;
+				}
+				if (type === "Italic") {
+					standardFont =
+						StandardFonts.HelveticaOblique;
+				}
+				if (type === "BoldItalic") {
+					standardFont =
+						StandardFonts.HelveticaBoldOblique;
+				}
+			}
+			return await this.pdfDoc.embedFont(standardFont);
+		};
 
-		this.codeFont = await this.pdfDoc.embedFont(
-			StandardFonts.Courier,
+		// Load base fonts based on Body config
+		const bodyFontName = this.config.pdf.body.fontFamily;
+		this.font = await loadFont(bodyFontName, "Regular");
+		this.boldFont = await loadFont(bodyFontName, "Bold");
+		this.italicFont = await loadFont(bodyFontName, "Italic");
+		this.boldItalicFont = await loadFont(
+			bodyFontName,
+			"BoldItalic",
+		);
+
+		// Code font
+		this.codeFont = await loadFont(
+			this.config.pdf.code.fontFamily,
+			"Regular",
 		);
 
 		this.addPage();
@@ -117,21 +192,18 @@ export class PdfGenerator {
 					cell.source.join(""),
 				);
 			} else if (cell.cell_type === "code") {
-				this.drawText(cell.source.join(""), {
-					isCode: true,
-				});
+				this.drawCodeBlock(cell.source.join(""));
 				this.y -= 10;
 
 				if (cell.outputs) {
 					for (const output of cell.outputs) {
 						if (output.text) {
-							this.drawText(
+							// Output text usually doesn't need highlighting but needs structure
+							this.drawCodeBlock(
 								output.text.join(
 									"",
 								),
-								{
-									isCode: true,
-								},
+								true, // isOutput
 							);
 						}
 
@@ -208,6 +280,21 @@ export class PdfGenerator {
 		return this.pdfDoc.save();
 	}
 
+	// Helper to hex to rgb
+	private hexToRgb(hex: string): Color {
+		const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
+			hex,
+		);
+		if (result) {
+			return rgb(
+				parseInt(result[1], 16) / 255,
+				parseInt(result[2], 16) / 255,
+				parseInt(result[3], 16) / 255,
+			);
+		}
+		return rgb(0, 0, 0);
+	}
+
 	private addPage() {
 		this.page = this.pdfDoc.addPage();
 		const { width, height } = this.page.getSize();
@@ -238,8 +325,11 @@ export class PdfGenerator {
 			}
 		} else if (node.type === "paragraph") {
 			if (node.children) {
-				// Flatten children to text runs for simpler wrapping
-				// This is a simplification. Ideally check children types.
+				// We need to flatten children to handle mixed styles in ONE flow if possible
+				// OR just rely on drawRuns which splits by words.
+				// For paragraph mode, we want standard text wrapping.
+
+				// Collect all runs
 				this.drawRuns(node.children);
 				this.y -= this.lineHeight / 2;
 			}
@@ -248,48 +338,48 @@ export class PdfGenerator {
 			const oldSize = this.fontSize;
 			const oldColor = this.currentColor;
 
-			// Word-like styling
+			// Config based styling
 			let spacingBefore = 10;
 			let spacingAfter = 10;
+			let styleObj = this.config.pdf.heading1;
 
 			switch (depth) {
 				case 1:
-					this.fontSize = 24;
-					this.currentColor = rgb(
-						0.18,
-						0.33,
-						0.59,
-					); // Dark Blue #2F5496
+					styleObj = this.config.pdf.heading1;
 					spacingBefore = 20;
-					spacingAfter = 10;
+					spacingAfter = 20;
+					this.lineHeight = Math.round(
+						this.fontSize * 1.2,
+					);
 					break;
 				case 2:
-					this.fontSize = 18;
-					this.currentColor = rgb(
-						0.18,
-						0.33,
-						0.59,
-					); // Dark Blue #2F5496
+					styleObj = this.config.pdf.heading2;
 					spacingBefore = 16;
-					spacingAfter = 10;
+					spacingAfter = 16;
+					this.lineHeight = Math.round(
+						this.fontSize * 1.2,
+					);
 					break;
 				case 3:
-					this.fontSize = 14;
-					this.currentColor = rgb(
-						0.12,
-						0.22,
-						0.39,
-					); // Darker Blue #1F3763
+					styleObj = this.config.pdf.heading3;
 					spacingBefore = 14;
-					spacingAfter = 10;
+					spacingAfter = 14;
+					this.lineHeight = Math.round(
+						this.fontSize * 1.2,
+					);
 					break;
 				default:
-					this.fontSize = 12;
-					this.currentColor = rgb(0, 0, 0); // Black
+					styleObj = this.config.pdf.body;
 					spacingBefore = 12;
-					spacingAfter = 10;
+					spacingAfter = 12;
+					this.lineHeight = Math.round(
+						this.fontSize * 1,
+					);
 					break;
 			}
+
+			this.fontSize = styleObj.fontSize;
+			this.currentColor = this.hexToRgb(styleObj.color);
 
 			// Apply spacing before
 			this.y -= spacingBefore;
@@ -337,7 +427,169 @@ export class PdfGenerator {
 				}
 			}
 			this.currentIndent -= 20;
+		} else if (node.type === "code") {
+			// Markdown code block
+			this.drawCodeBlock(node.value || "");
 		}
+	}
+
+	private drawCodeBlock(code: string, isOutput: boolean = false) {
+		const fontSize = this.config.pdf.code.fontSize;
+		const fontFamily = this.codeFont;
+		const lineHeight = Math.round(fontSize * 1.2);
+
+		// Background color? Drawing a rectangle for the whole block is hard without pre-calculating height.
+		// For now, let's just draw text.
+
+		const lines = code.split("\n");
+
+		// Simple syntax highlighting regex
+		const keywords = [
+			"import",
+			"from",
+			"def",
+			"class",
+			"return",
+			"if",
+			"else",
+			"elif",
+			"for",
+			"while",
+			"print",
+			"const",
+			"let",
+			"var",
+			"function",
+			"async",
+			"await",
+			"try",
+			"catch",
+			"finally",
+			"public",
+			"private",
+			"protected",
+			"interface",
+			"type",
+			"module",
+			"export",
+			"default",
+		];
+		const keywordRegex = new RegExp(
+			`\\b(${keywords.join("|")})\\b`,
+			"g",
+		);
+
+		const defaultColor = isOutput
+			? rgb(0.2, 0.2, 0.2)
+			: this.hexToRgb(this.config.pdf.code.color || "000000"); // Only exists if we update interface, assuming black or dark grey
+		// wait, code config only has backgroundColor in interface currently?
+		// extension.ts shows: code: { fontFamily, fontSize, backgroundColor }
+		// so font color is not user configurable yet? defaults to black/dark.
+
+		const keywordColor = rgb(0, 0, 1); // Blue
+
+		for (const line of lines) {
+			let cursorX = this.margin + (isOutput ? 20 : 0); // Indent outputs slightly
+
+			this.checkPageBreak();
+
+			// Indentation preservation
+			const leadingSpacesMatch = line.match(/^ */);
+			const leadingSpacesCount = leadingSpacesMatch
+				? leadingSpacesMatch[0].length
+				: 0;
+
+			// Calculate space width
+			const spaceWidth = fontFamily.widthOfTextAtSize(
+				" ",
+				fontSize,
+			);
+			cursorX += leadingSpacesCount * spaceWidth;
+
+			const trimmedContent =
+				line.substring(leadingSpacesCount);
+
+			if (trimmedContent.length === 0) {
+				this.y -= lineHeight;
+				continue;
+			}
+
+			if (isOutput) {
+				// No highlighting for output
+				this.page.drawText(trimmedContent, {
+					x: cursorX,
+					y: this.y,
+					size: fontSize,
+					font: fontFamily,
+					color: defaultColor,
+				});
+			} else {
+				// Syntax Highlighting
+				let lastIndex = 0;
+				let match;
+				keywordRegex.lastIndex = 0;
+
+				while (
+					(match =
+						keywordRegex.exec(
+							trimmedContent,
+						)) !== null
+				) {
+					// Before match
+					const before = trimmedContent.substring(
+						lastIndex,
+						match.index,
+					);
+					if (before.length > 0) {
+						this.page.drawText(before, {
+							x: cursorX,
+							y: this.y,
+							size: fontSize,
+							font: fontFamily,
+							color: defaultColor,
+						});
+						cursorX +=
+							fontFamily.widthOfTextAtSize(
+								before,
+								fontSize,
+							);
+					}
+
+					// Match
+					this.page.drawText(match[0], {
+						x: cursorX,
+						y: this.y,
+						size: fontSize,
+						font: fontFamily,
+						color: keywordColor,
+					});
+					cursorX += fontFamily.widthOfTextAtSize(
+						match[0],
+						fontSize,
+					);
+
+					lastIndex = keywordRegex.lastIndex;
+				}
+
+				// Remaining
+				const remaining =
+					trimmedContent.substring(lastIndex);
+				if (remaining.length > 0) {
+					this.page.drawText(remaining, {
+						x: cursorX,
+						y: this.y,
+						size: fontSize,
+						font: fontFamily,
+						color: defaultColor,
+					});
+				}
+			}
+
+			this.y -= lineHeight;
+		}
+
+		// Add some spacing after block
+		this.y -= 5;
 	}
 
 	private drawRuns(nodes: ASTNode[], forceBold: boolean = false) {
@@ -453,6 +705,13 @@ export class PdfGenerator {
 		const { isCode = false } = options;
 		const currentFont = isCode ? this.codeFont : this.font;
 		const lines = text.split("\n");
+
+		if (isCode) {
+			this.fontSize = this.config.pdf.code.fontSize;
+			// Draw background if needed (complicated in simple text flow)
+			// For now just change color?
+			// this.currentColor = this.hexToRgb("C7254E"); // Or config
+		}
 
 		for (const line of lines) {
 			const words = line.split(" ");

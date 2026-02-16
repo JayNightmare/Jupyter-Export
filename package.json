@@ -44,12 +44,22 @@
 				"command": "jupyterExport.export",
 				"title": "Export to Word/PDF",
 				"icon": "$(export)"
+			},
+			{
+				"command": "jupyterExport.exportStyling",
+				"title": "Export Styling",
+				"icon": "$(settings)"
 			}
 		],
 		"menus": {
 			"notebook/toolbar": [
 				{
 					"command": "jupyterExport.export",
+					"group": "navigation",
+					"when": "notebookType == jupyter-notebook"
+				},
+				{
+					"command": "jupyterExport.exportStyling",
 					"group": "navigation",
 					"when": "notebookType == jupyter-notebook"
 				}
@@ -77,6 +87,181 @@
 					"type": "number",
 					"default": 12,
 					"description": "Base font size for exported documents."
+				},
+				"jupyterExport.word.heading1.fontFamily": {
+					"type": "string",
+					"default": "Helvetica",
+					"description": "Font family for Heading 1 in Word export."
+				},
+				"jupyterExport.word.heading1.fontSize": {
+					"type": "number",
+					"default": 24,
+					"description": "Font size for Heading 1 in Word export."
+				},
+				"jupyterExport.word.heading1.color": {
+					"type": "string",
+					"default": "000000",
+					"description": "Hex color for Heading 1 in Word export."
+				},
+				"jupyterExport.word.heading2.fontFamily": {
+					"type": "string",
+					"default": "Helvetica",
+					"description": "Font family for Heading 2 in Word export."
+				},
+				"jupyterExport.word.heading2.fontSize": {
+					"type": "number",
+					"default": 18,
+					"description": "Font size for Heading 2 in Word export."
+				},
+				"jupyterExport.word.heading2.color": {
+					"type": "string",
+					"default": "000000",
+					"description": "Hex color for Heading 2 in Word export."
+				},
+				"jupyterExport.word.heading3.fontFamily": {
+					"type": "string",
+					"default": "Helvetica",
+					"description": "Font family for Heading 3 in Word export."
+				},
+				"jupyterExport.word.heading3.fontSize": {
+					"type": "number",
+					"default": 14,
+					"description": "Font size for Heading 3 in Word export."
+				},
+				"jupyterExport.word.heading3.color": {
+					"type": "string",
+					"default": "000000",
+					"description": "Hex color for Heading 3 in Word export."
+				},
+				"jupyterExport.word.body.fontFamily": {
+					"type": "string",
+					"default": "Helvetica",
+					"description": "Font family for Body text in Word export."
+				},
+				"jupyterExport.word.body.fontSize": {
+					"type": "number",
+					"default": 12,
+					"description": "Font size for Body text in Word export."
+				},
+				"jupyterExport.word.body.color": {
+					"type": "string",
+					"default": "000000",
+					"description": "Hex color for Body text in Word export."
+				},
+				"jupyterExport.word.code.fontFamily": {
+					"type": "string",
+					"default": "Courier New",
+					"description": "Font family for Code blocks in Word export."
+				},
+				"jupyterExport.word.code.fontSize": {
+					"type": "number",
+					"default": 10,
+					"description": "Font size for Code blocks in Word export."
+				},
+				"jupyterExport.word.code.backgroundColor": {
+					"type": "string",
+					"default": "F0F0F0",
+					"description": "Hex background color for Code blocks in Word export."
+				},
+				"jupyterExport.pdf.heading1.fontFamily": {
+					"type": "string",
+					"default": "Helvetica",
+					"enum": [
+						"Helvetica",
+						"Times-Roman",
+						"Courier"
+					],
+					"description": "Font family for Heading 1 in PDF export."
+				},
+				"jupyterExport.pdf.heading1.fontSize": {
+					"type": "number",
+					"default": 24,
+					"description": "Font size for Heading 1 in PDF export."
+				},
+				"jupyterExport.pdf.heading1.color": {
+					"type": "string",
+					"default": "000000",
+					"description": "Hex color for Heading 1 in PDF export."
+				},
+				"jupyterExport.pdf.heading2.fontFamily": {
+					"type": "string",
+					"default": "Helvetica",
+					"enum": [
+						"Helvetica",
+						"Times-Roman",
+						"Courier"
+					],
+					"description": "Font family for Heading 2 in PDF export."
+				},
+				"jupyterExport.pdf.heading2.fontSize": {
+					"type": "number",
+					"default": 18,
+					"description": "Font size for Heading 2 in PDF export."
+				},
+				"jupyterExport.pdf.heading2.color": {
+					"type": "string",
+					"default": "000000",
+					"description": "Hex color for Heading 2 in PDF export."
+				},
+				"jupyterExport.pdf.heading3.fontFamily": {
+					"type": "string",
+					"default": "Helvetica",
+					"enum": [
+						"Helvetica",
+						"Times-Roman",
+						"Courier"
+					],
+					"description": "Font family for Heading 3 in PDF export."
+				},
+				"jupyterExport.pdf.heading3.fontSize": {
+					"type": "number",
+					"default": 14,
+					"description": "Font size for Heading 3 in PDF export."
+				},
+				"jupyterExport.pdf.heading3.color": {
+					"type": "string",
+					"default": "000000",
+					"description": "Hex color for Heading 3 in PDF export."
+				},
+				"jupyterExport.pdf.body.fontFamily": {
+					"type": "string",
+					"default": "Helvetica",
+					"enum": [
+						"Helvetica",
+						"Times-Roman",
+						"Courier"
+					],
+					"description": "Font family for Body text in PDF export."
+				},
+				"jupyterExport.pdf.body.fontSize": {
+					"type": "number",
+					"default": 12,
+					"description": "Font size for Body text in PDF export."
+				},
+				"jupyterExport.pdf.body.color": {
+					"type": "string",
+					"default": "000000",
+					"description": "Hex color for Body text in PDF export."
+				},
+				"jupyterExport.pdf.code.fontFamily": {
+					"type": "string",
+					"default": "Courier",
+					"enum": [
+						"Helvetica",
+						"Times-Roman",
+						"Courier"
+					],
+					"description": "Font family for Code blocks in PDF export."
+				},
+				"jupyterExport.pdf.code.fontSize": {
+					"type": "number",
+					"default": 10,
+					"description": "Font size for Code blocks in PDF export."
+				},
+				"jupyterExport.pdf.code.backgroundColor": {
+					"type": "string",
+					"default": "F0F0F0",
+					"description": "Hex background color for Code blocks in PDF export."
 				}
 			}
 		}
