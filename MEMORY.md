@@ -7,7 +7,7 @@ Allow the user to export a Jupyter notebook file as a Word Doc or a PDF.
 ## Constraints & Requirements
 
 - **No External Tools**: The extension should not require the user to install external tools (like Pandoc or LaTeX) to generate the Word Doc or PDF. It should be self-contained or use lightweight JS libraries.
-- **UI**: Add a button to the "Editor Bottom" (Status Bar or similar location in VS Code context) which, when pressed, opens a prompt for the user to choose the export format.
+- **UI**: Add a button to the **Notebook Toolbar** (top right of the editor) which, when pressed, opens a prompt for the user to choose the export format.
 - **Output Location**: Exports should be saved to `{project-root}/docs/jupyter-notebook`.
 
 ## Active Tasks
@@ -16,14 +16,15 @@ Allow the user to export a Jupyter notebook file as a Word Doc or a PDF.
 
 - [x] **Project Initialization**: Setup repo, `package.json`, and `src` structure.
 - [x] **Core Logic**: Implemented `.ipynb` parser and generators for `.docx` and `.pdf`.
-- [x] **UI Integration**: Added Status Bar item and "Export Notebook" command.
+- [x] **UI Integration**: Added "Export Notebook" command to the Notebook Toolbar.
 - [x] **Verification**: Created sample notebook and verified export functionality manually.
+- [x] **Markdown Formatting**: Implemented parsing of Markdown cells using `unified` and `remark-parse`.
+- [x] **Image Support**: Implemented embedding of base64 images from notebook outputs.
+- [x] **Configuration**: Added VS Code settings for output directory, font family, and font size.
 
 ### Next Steps
 
-- [ ] **Markdown Formatting**: Improve `DocxGenerator` and `PdfGenerator` to render markdown syntax (bold, italic, headers, lists) instead of raw text.
-- [ ] **Image Support**: Implement extraction and embedding of base64 images from notebook outputs into `.docx` and `.pdf`.
-- [ ] **Styling Configuration**: Add VS Code settings for font sizes, margins, and code block styles.
+- [ ] **Verification**: User to manually verify exports with the latest build.
 - [ ] **Robust Error Handling**: Improve error messaging for permission overrides and malformed notebooks.
 
 ## Architecture
@@ -47,5 +48,10 @@ Allow the user to export a Jupyter notebook file as a Word Doc or a PDF.
 
 ## History
 
+- **2026-02-16**: Fixed DOCX code block formatting to correctly handle line breaks by splitting content into multiple `TextRun`s.
+- **2026-02-16**: Enhanced PDF header styling to match Word document aesthetics (Blue color, specific font sizes, and spacing).
+- **2026-02-16**: Fixed PDF export formatting (indented lists, italics support) by enhancing `PdfGenerator` AST traversal and font loading.
+- **2026-02-15**: Moved "Export Notebook" button from Status Bar to Notebook Toolbar for better UX.
+- **2026-02-15**: Completed Phase 2: Added Markdown formatting (via `unified`/`remark`), Image embedding, and Configuration settings. Fixed compilation issues (Blob/ESM) by updating `tsconfig.json`.
 - **2026-02-15**: Implemented core export logic (Parser, DocxGenerator, PdfGenerator) and UI integration. Added `docx` and `pdf-lib` dependencies.
 - **2026-02-15**: Project setup initialized. Created MEMORY.md and docs structure.

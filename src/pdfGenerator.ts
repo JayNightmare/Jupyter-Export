@@ -5,6 +5,7 @@ import {
 	PDFFont,
 	PDFPage,
 	PDFImage,
+	Color,
 } from "pdf-lib";
 import { NotebookData } from "./notebookParser";
 
@@ -26,7 +27,9 @@ export class PdfGenerator {
 	private config: GeneratorConfig;
 	private pdfDoc!: PDFDocument;
 	private font!: PDFFont;
-	private boldFont!: PDFFont; // Using standard font for bold simulation if needed, or actual bold font
+	private boldFont!: PDFFont;
+	private italicFont!: PDFFont;
+	private boldItalicFont!: PDFFont;
 	private codeFont!: PDFFont;
 	private page!: PDFPage;
 	private width!: number;
@@ -35,6 +38,8 @@ export class PdfGenerator {
 	private margin = 50;
 	private fontSize = 12; // Will be overwritten by config
 	private lineHeight = 14;
+	private currentIndent = 0;
+	private currentColor: Color = rgb(0, 0, 0);
 
 	constructor(
 		config: GeneratorConfig = {
@@ -59,6 +64,13 @@ export class PdfGenerator {
 				this.boldFont = await this.pdfDoc.embedFont(
 					StandardFonts.TimesRomanBold,
 				);
+				this.italicFont = await this.pdfDoc.embedFont(
+					StandardFonts.TimesRomanItalic,
+				);
+				this.boldItalicFont =
+					await this.pdfDoc.embedFont(
+						StandardFonts.TimesRomanBoldItalic,
+					);
 				break;
 			case "Courier":
 				this.font = await this.pdfDoc.embedFont(
@@ -67,6 +79,13 @@ export class PdfGenerator {
 				this.boldFont = await this.pdfDoc.embedFont(
 					StandardFonts.CourierBold,
 				);
+				this.italicFont = await this.pdfDoc.embedFont(
+					StandardFonts.CourierOblique,
+				);
+				this.boldItalicFont =
+					await this.pdfDoc.embedFont(
+						StandardFonts.CourierBoldOblique,
+					);
 				break;
 			case "Helvetica":
 			default:
@@ -76,6 +95,13 @@ export class PdfGenerator {
 				this.boldFont = await this.pdfDoc.embedFont(
 					StandardFonts.HelveticaBold,
 				);
+				this.italicFont = await this.pdfDoc.embedFont(
+					StandardFonts.HelveticaOblique,
+				);
+				this.boldItalicFont =
+					await this.pdfDoc.embedFont(
+						StandardFonts.HelveticaBoldOblique,
+					);
 				break;
 		}
 
@@ -202,8 +228,7 @@ export class PdfGenerator {
 
 		const processor = unified().use(remarkParse.default as any);
 		const ast = processor.parse(text) as unknown as ASTNode;
-		this.processAst(ast);
-		this.y -= 10; // Spacing after markdown block
+		return this.processAst(ast);
 	}
 
 	private processAst(node: ASTNode) {
@@ -219,36 +244,99 @@ export class PdfGenerator {
 				this.y -= this.lineHeight / 2;
 			}
 		} else if (node.type === "heading") {
+			const depth = node.depth || 1;
 			const oldSize = this.fontSize;
-			this.fontSize = oldSize + (7 - (node.depth || 1)) * 2; // Simple scaling
-			// Bold for headings
+			const oldColor = this.currentColor;
+
+			// Word-like styling
+			let spacingBefore = 10;
+			let spacingAfter = 10;
+
+			switch (depth) {
+				case 1:
+					this.fontSize = 24;
+					this.currentColor = rgb(
+						0.18,
+						0.33,
+						0.59,
+					); // Dark Blue #2F5496
+					spacingBefore = 20;
+					spacingAfter = 10;
+					break;
+				case 2:
+					this.fontSize = 18;
+					this.currentColor = rgb(
+						0.18,
+						0.33,
+						0.59,
+					); // Dark Blue #2F5496
+					spacingBefore = 16;
+					spacingAfter = 10;
+					break;
+				case 3:
+					this.fontSize = 14;
+					this.currentColor = rgb(
+						0.12,
+						0.22,
+						0.39,
+					); // Darker Blue #1F3763
+					spacingBefore = 14;
+					spacingAfter = 10;
+					break;
+				default:
+					this.fontSize = 12;
+					this.currentColor = rgb(0, 0, 0); // Black
+					spacingBefore = 12;
+					spacingAfter = 10;
+					break;
+			}
+
+			// Apply spacing before
+			this.y -= spacingBefore;
+			this.checkPageBreak(this.fontSize + spacingAfter);
+
 			if (node.children) {
 				this.drawRuns(node.children, true);
 			}
+
 			this.fontSize = oldSize;
-			this.y -= 10;
+			this.currentColor = oldColor;
+			this.y -= spacingAfter;
 		} else if (node.type === "list") {
+			this.currentIndent += 20;
 			if (node.children) {
 				for (const item of node.children) {
-					// List item children usually paragraph
-					if (item.children) {
+					// Check for list item
+					if (item.type === "listItem") {
+						// Draw the bullet point manually before processing the item content
 						const bullet = node.ordered
-							? `1. `
-							: `• `;
-						this.drawText(bullet, {
-							continuation: false,
-							indent: 0,
-						}); // Draw bullet on its own line? No, simpler way needed.
-						// Actually, bullet needs to be same line as first run.
-						// Simplification: Just indentation for now
-						// Reset x? PDF-Lib is absolute.
-						// Let's just prefix the first run of the item.
-						// Re-using processAst will force new lines for paragraphs.
-						// Let's blindly just traverse.
-						this.processAst(item);
+							? "1. "
+							: "• ";
+						this.page.drawText(bullet, {
+							x:
+								this.margin +
+								this
+									.currentIndent -
+								15, // Hanging indent for bullet
+							y: this.y,
+							size: this.fontSize,
+							font: this.font,
+							color: this
+								.currentColor,
+						});
+
+						// Process the content of the list item
+						if (item.children) {
+							for (const child of item.children) {
+								this.processAst(
+									child,
+								);
+							}
+						}
 					}
 				}
 			}
+			this.currentIndent -= 20;
 		}
 	}
 
@@ -259,7 +347,7 @@ export class PdfGenerator {
 		// For iteration 2: Just flatten to plain text for wrapping if complicated,
 		// OR implement a basic "Cursor" system.
 
-		let cursorX = this.margin;
+		let cursorX = this.margin + this.currentIndent;
 
 		// Flatten nodes to words with style
 		interface StyledWord {
@@ -271,15 +359,21 @@ export class PdfGenerator {
 		const collectWords = (
 			subNodes: ASTNode[],
 			isBold: boolean,
+			isItalic: boolean,
 			isCode: boolean,
 		) => {
 			for (const node of subNodes) {
 				if (node.type === "text") {
-					const font = isCode
-						? this.codeFont
-						: isBold
-							? this.boldFont
-							: this.font;
+					let font = this.font;
+					if (isCode) {
+						font = this.codeFont;
+					} else if (isBold && isItalic) {
+						font = this.boldItalicFont;
+					} else if (isBold) {
+						font = this.boldFont;
+					} else if (isItalic) {
+						font = this.italicFont;
+					}
 					const w = (node.value || "").split(" ");
 					for (let i = 0; i < w.length; i++) {
 						words.push({
@@ -296,13 +390,14 @@ export class PdfGenerator {
 					collectWords(
 						node.children || [],
 						true,
+						isItalic,
 						isCode,
 					);
 				} else if (node.type === "emphasis") {
-					// Italic not implemented yet
 					collectWords(
 						node.children || [],
 						isBold,
+						true,
 						isCode,
 					);
 				} else if (node.type === "inlineCode") {
@@ -314,13 +409,14 @@ export class PdfGenerator {
 							},
 						],
 						isBold,
+						isItalic,
 						true,
 					);
 				}
 			}
 		};
 
-		collectWords(nodes, forceBold, false);
+		collectWords(nodes, forceBold, false, false);
 
 		// Draw words
 		for (const word of words) {
@@ -330,7 +426,7 @@ export class PdfGenerator {
 			);
 			if (cursorX + textWidth > this.width - this.margin) {
 				this.y -= this.lineHeight;
-				cursorX = this.margin;
+				cursorX = this.margin + this.currentIndent;
 				this.checkPageBreak();
 			}
 
@@ -339,6 +435,7 @@ export class PdfGenerator {
 				y: this.y,
 				size: this.fontSize,
 				font: word.font,
+				color: this.currentColor,
 			});
 			cursorX += textWidth;
 		}
@@ -382,6 +479,7 @@ export class PdfGenerator {
 					y: this.y,
 					size: this.fontSize,
 					font: currentFont,
+					color: this.currentColor,
 				});
 				cursorX += textWidth;
 			}

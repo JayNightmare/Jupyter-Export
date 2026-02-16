@@ -306,14 +306,18 @@ export class DocxGenerator {
 	}
 
 	private createCodeParagraph(code: string): docx.Paragraph {
+		const lines = code.split("\n");
+		const runs = lines.map((line, index) => {
+			return new docx.TextRun({
+				text: line,
+				font: "Courier New",
+				size: 20,
+				break: index > 0 ? 1 : 0,
+			});
+		});
+
 		return new docx.Paragraph({
-			children: [
-				new docx.TextRun({
-					text: code,
-					font: "Courier New",
-					size: 20,
-				}),
-			],
+			children: runs,
 			spacing: { after: 200 },
 			shading: {
 				type: docx.ShadingType.CLEAR,

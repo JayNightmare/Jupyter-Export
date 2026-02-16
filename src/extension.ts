@@ -8,43 +8,6 @@ import { PdfGenerator } from "./pdfGenerator";
 export function activate(context: vscode.ExtensionContext) {
 	console.log("Jupyter To Docx is now active!");
 
-	// Status Bar Item
-	const statusBarItem = vscode.window.createStatusBarItem(
-		vscode.StatusBarAlignment.Right,
-		100,
-	);
-	statusBarItem.command = "jupyterToDocx.export";
-	statusBarItem.text = "$(export) Export Notebook";
-	context.subscriptions.push(statusBarItem);
-
-	// Update status bar visibility
-	const updateStatusBar = () => {
-		const editor = vscode.window.activeNotebookEditor;
-		if (editor) {
-			statusBarItem.show();
-		} else {
-			const activeEditor = vscode.window.activeTextEditor;
-			if (
-				activeEditor &&
-				activeEditor.document.languageId ===
-					"jupyter-notebook"
-			) {
-				// Keep it visible if text editor is opening a notebook (raw json)
-				statusBarItem.show();
-			} else {
-				statusBarItem.hide();
-			}
-		}
-	};
-
-	context.subscriptions.push(
-		vscode.window.onDidChangeActiveNotebookEditor(updateStatusBar),
-	);
-	context.subscriptions.push(
-		vscode.window.onDidChangeActiveTextEditor(updateStatusBar),
-	);
-	updateStatusBar();
-
 	// Register Command
 	const exportCommand = vscode.commands.registerCommand(
 		"jupyterToDocx.export",
@@ -104,7 +67,10 @@ export function activate(context: vscode.ExtensionContext) {
 						// Get content
 						let content = "";
 						// Type guard or cast
-						if ("cells" in document!) {
+						if (
+							"notebookType" in
+							document!
+						) {
 							// vscode.NotebookDocument
 							// This is tricky. NotebookDocument gives cells, but our parser expects raw JSON string.
 							// We can reconstruct JSON from cells, or read the file from disk if it's saved.

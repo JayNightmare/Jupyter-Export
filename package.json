@@ -17,9 +17,19 @@
 		"commands": [
 			{
 				"command": "jupyterToDocx.export",
-				"title": "Export Notebook to Word/PDF"
+				"title": "Export to Word/PDF",
+				"icon": "$(export)"
 			}
 		],
+		"menus": {
+			"notebook/toolbar": [
+				{
+					"command": "jupyterToDocx.export",
+					"group": "navigation",
+					"when": "notebookType == jupyter-notebook"
+				}
+			]
+		},
 		"configuration": {
 			"title": "Jupyter To Docx",
 			"properties": {
