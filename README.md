@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="media/icon.png" width="100" height="100">
+<img src="src/media/icon.png" width="100" height="100">
 
 # Jupyter Export
 

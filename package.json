@@ -2,8 +2,8 @@
 	"name": "jupyter-export",
 	"displayName": "Jupyter Export",
 	"description": "Export Jupyter Notebooks to Word and PDF",
-	"version": "0.0.1",
-	"icon": "icon.png",
+	"version": "0.0.3",
+	"icon": "src/media/icon.png",
 	"engines": {
 		"vscode": "^1.75.0"
 	},
