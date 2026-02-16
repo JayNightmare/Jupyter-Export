@@ -1,71 +1,51 @@
-# juypter-exporter README
+<div align="center">
 
-This is the README for your extension "juypter-exporter". After writing up a brief description, we recommend including the following sections.
+<img src="media/icon.png" width="100" height="100">
+
+# Jupyter Export
+
+Export your Jupyter Notebooks (`.ipynb`) to professional Word Documents (`.docx`) and PDFs (`.pdf`) directly from VS Code.
+
+</div>
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- **No External Dependencies**: Works out of the box without installing Pandoc, LaTeX, or other system tools.
+- **Seamless Integration**: accessible directly from the Notebook Toolbar or Command Palette.
+- **Rich Content Support**:
+     - Markdown cells (headings, lists, bold, italic, etc.)
+     - Code blocks with syntax highlighting preservation (text-based)
+     - Output images (Matplotlib, etc.) embedded directly
+     - Tables
 
-For example if there is an image subfolder under your extension project workspace:
+## Usage
 
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+1. Open a Jupyter Notebook (`.ipynb`).
+2. Click the **Export** icon in the Notebook Toolbar (top right).
+3. Or, run the command **"Jupyter Export: Export to Word/PDF"** from the Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`).
+4. Select your desired format: **Word (.docx)** or **PDF (.pdf)**.
+5. The exported file will be saved to your configured output directory (default: `docs/jupyter-notebook` within your workspace).
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+- `jupyterExport.outputDir`: Relative path to the folder where exported files will be saved. Default: `docs/jupyter-notebook`.
+- `jupyterExport.fontFamily`: Font family to use for PDF exports. Options: `Helvetica`, `Times-Roman`, `Courier`. Default: `Helvetica`.
+- `jupyterExport.fontSize`: Base font size for the exported document. Default: `12`.
+
+## Requirements
+
+None! This extension bundles all necessary logic to generate documents.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- Complex LaTeX math equations may have limited rendering support in this version.
+- Interactive widget outputs are static.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+- Initial release.
+- Support for .docx and .pdf export.
