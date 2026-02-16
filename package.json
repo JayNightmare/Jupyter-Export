@@ -12,6 +12,28 @@
 		"Notebooks",
 		"Data Science"
 	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/JayNightmare/jupyter-export.git"
+	},
+	"bugs": {
+		"url": "https://github.com/JayNightmare/jupyter-export/issues"
+	},
+	"homepage": "https://github.com/JayNightmare/jupyter-export#readme",
+	"author": {
+		"name": "JayNightmare",
+		"email": "jn3.enquiries@gmail.com",
+		"url": "https://github.com/JayNightmare"
+	},
+	"license": "MIT",
+	"publisher": "JayNightmare",
+	"keywords": [
+		"jupyter",
+		"notebook",
+		"export",
+		"word",
+		"pdf"
+	],
 	"activationEvents": [
 		"onLanguage:jupyter-notebook"
 	],
