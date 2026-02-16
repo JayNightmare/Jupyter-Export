@@ -3,11 +3,14 @@
 	"displayName": "Jupyter Export",
 	"description": "Export Jupyter Notebooks to Word and PDF",
 	"version": "0.0.1",
+	"icon": "icon.png",
 	"engines": {
 		"vscode": "^1.75.0"
 	},
 	"categories": [
-		"Other"
+		"Other",
+		"Notebooks",
+		"Data Science"
 	],
 	"activationEvents": [
 		"onLanguage:jupyter-notebook"

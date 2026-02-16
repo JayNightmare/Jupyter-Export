@@ -1,0 +1,21 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle (optional, usually icons are transparent, but let's give it a container shape or just the doc) -->
+  <!-- Document Shape -->
+  <path d="M28 16 C28 11.58 31.58 8 36 8 H84 L108 32 V112 C108 116.42 104.42 120 100 120 H36 C31.58 120 28 116.42 28 112 Z" fill="#F37626"/>
+  
+  <!-- Folded Corner -->
+  <path d="M84 8 V32 H108" fill="#E65100"/>
+  
+  <!-- Brackets [] for Code/Jupyter context -->
+  <path d="M50 48 H44 V80 H50" stroke="white" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M78 48 H84 V80 H78" stroke="white" stroke-width="6" fill="none" stroke-linecap="round"/>
+  
+  <!-- Code lines inside brackets -->
+  <rect x="54" y="54" width="20" height="4" rx="2" fill="white" opacity="0.9"/>
+  <rect x="54" y="64" width="14" height="4" rx="2" fill="white" opacity="0.9"/>
+
+  <!-- Export Arrow Circle Badge -->
+  <circle cx="96" cy="96" r="24" fill="#2196F3" stroke="white" stroke-width="4"/>
+  <!-- Arrow Icon -->
+  <path d="M86 96 H100 M100 96 L94 90 M100 96 L94 102" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
