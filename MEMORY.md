@@ -1,4 +1,4 @@
-# Project Memory: Jupyter To Docx
+# Project Memory: Jupyter Export
 
 ## Project Goal
 

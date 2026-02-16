@@ -6,11 +6,11 @@ import { DocxGenerator } from "./docxGenerator";
 import { PdfGenerator } from "./pdfGenerator";
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log("Jupyter To Docx is now active!");
+	console.log("Jupyter Export is now active!");
 
 	// Register Command
 	const exportCommand = vscode.commands.registerCommand(
-		"jupyterToDocx.export",
+		"jupyterExport.export",
 		async () => {
 			const editor = vscode.window.activeNotebookEditor;
 			let document:
@@ -107,7 +107,7 @@ export function activate(context: vscode.ExtensionContext) {
 						// Read configuration
 						const config =
 							vscode.workspace.getConfiguration(
-								"jupyterToDocx",
+								"jupyterExport",
 							);
 						const outputDirConfig =
 							config.get<string>(

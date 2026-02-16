@@ -1,6 +1,6 @@
 {
-	"name": "juypter-to-docx",
-	"displayName": "Jupyter To Docx",
+	"name": "jupyter-export",
+	"displayName": "Jupyter Export",
 	"description": "Export Jupyter Notebooks to Word and PDF",
 	"version": "0.0.1",
 	"engines": {
@@ -16,7 +16,7 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "jupyterToDocx.export",
+				"command": "jupyterExport.export",
 				"title": "Export to Word/PDF",
 				"icon": "$(export)"
 			}
@@ -24,21 +24,21 @@
 		"menus": {
 			"notebook/toolbar": [
 				{
-					"command": "jupyterToDocx.export",
+					"command": "jupyterExport.export",
 					"group": "navigation",
 					"when": "notebookType == jupyter-notebook"
 				}
 			]
 		},
 		"configuration": {
-			"title": "Jupyter To Docx",
+			"title": "Jupyter-Export",
 			"properties": {
-				"jupyterToDocx.outputDir": {
+				"jupyterExport.outputDir": {
 					"type": "string",
 					"default": "docs/jupyter-notebook",
 					"description": "Relative path to the output directory for exported files."
 				},
-				"jupyterToDocx.fontFamily": {
+				"jupyterExport.fontFamily": {
 					"type": "string",
 					"default": "Helvetica",
 					"enum": [
@@ -48,7 +48,7 @@
 					],
 					"description": "Font family for PDF export."
 				},
-				"jupyterToDocx.fontSize": {
+				"jupyterExport.fontSize": {
 					"type": "number",
 					"default": 12,
 					"description": "Base font size for exported documents."
