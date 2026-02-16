@@ -1,7 +1,7 @@
 .vscode/**
 .vscode-test/**
 src/**
-media/**
+!media/**
 .gitignore
 .yarnrc
 vsc-extension-quickstart.md
